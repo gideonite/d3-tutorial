@@ -2,6 +2,8 @@ var process_data = function(data) {
     return data.map(function(d){
         d['Petal.Length'] = parseFloat(d['Petal.Length']);
         d['Petal.Width'] = parseFloat(d['Petal.Width']);
+        d['Septal.Length'] = parseFloat(d['Septal.Length']);
+        d['Septal.Width'] = parseFloat(d['Septal.Width']);
 
         return d;
     });
@@ -33,7 +35,7 @@ var iris_plot = function(params) {
 
     // x
     var x_domain = data.map(function(d) {
-        return d['Petal.Width'];
+        return d[params.x_feature];
     });
     x_domain = [d3.min(x_domain), d3.max(x_domain)];
 
@@ -43,7 +45,7 @@ var iris_plot = function(params) {
 
     // y
     var y_domain = data.map(function(d) {
-        return d['Petal.Length'];
+        return d[params.y_feature];
     });
     y_domain = [d3.min(y_domain), d3.max(y_domain)];
 
@@ -65,6 +67,6 @@ var iris_plot = function(params) {
         .append('circle')
         .attr('r', dims.radius)
         .attr('fill', function(d) { return species_scale(d['Species']); })
-        .attr('cx', function(d) { return x(d['Petal.Width']); })
-        .attr('cy', function(d) { console.log(d['Petal.Length']); return y(d['Petal.Length']); });
+        .attr('cx', function(d) { return x(d[params.x_feature]); })
+        .attr('cy', function(d) { return y(d[params.y_feature]); });
 };
