@@ -20,8 +20,6 @@ var margin = {
 
 // params:
 var iris_plot = function(params) {
-
-
 //div, data, x_feature, y_feature
 
     data = process_data(params.data);
@@ -33,23 +31,25 @@ var iris_plot = function(params) {
         .attr('width', dims.width + 2 * dims.radius)
         .attr('height', dims.height + 2 * dims.radius);
 
-    var petal_length_domain = data.map(function(d) {
-        return d['Petal.Length'];
-    });
-    petal_length_domain = [d3.min(petal_length_domain), d3.max(petal_length_domain)];
-
-    var y = d3.scale.linear()
-        .domain(petal_length_domain)
-        .range([dims.radius, dims.height]);
-
-    var petal_width_domain = data.map(function(d) {
+    // x
+    var x_domain = data.map(function(d) {
         return d['Petal.Width'];
     });
-    petal_width_domain = [d3.min(petal_width_domain), d3.max(petal_width_domain)];
+    x_domain = [d3.min(x_domain), d3.max(x_domain)];
 
     var x = d3.scale.linear()
-        .domain(petal_width_domain)
+        .domain(x_domain)
         .range([dims.radius, dims.width]);
+
+    // y
+    var y_domain = data.map(function(d) {
+        return d['Petal.Length'];
+    });
+    y_domain = [d3.min(y_domain), d3.max(y_domain)];
+
+    var y = d3.scale.linear()
+        .domain(y_domain)
+        .range([dims.radius, dims.height]);
 
     var species_domain = data.map(function(d) {
         return d['Species'];
