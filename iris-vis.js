@@ -11,13 +11,14 @@ var process_data = function(data) {
 };
 
 var dims = {
-    width: 250,
-    height: 250,
-    radius: 2.5
+    width: 200,
+    height: 200,
+    radius: 2.5,
+    height_padding: 20
 };
 
 var margin = {
-    left: 50,
+    right: 20,
     top: 50
 };
 
@@ -29,7 +30,7 @@ var iris_scatter = function(params) {
 
     var svg = d3.select(params.div)
         .append('svg')
-        .style('margin-left', margin.left + "px")
+        .style('margin-right', margin.right + "px")
         .style('margin-top', margin.top + "px")
         .attr('width', dims.width + 2 * dims.radius)
         .attr('height', dims.height + 2 * dims.radius);
@@ -58,18 +59,61 @@ var iris_scatter = function(params) {
         return d['Species'];
     });
 
+    // lifted from the d3/lib
+    var d3_category20c = [
+        "#3182bd", "#6baed6", "#9ecae1", "#c6dbef",
+        "#e6550d", "#fd8d3c", "#fdae6b", "#fdd0a2",
+        "#31a354", "#74c476", "#a1d99b", "#c7e9c0",
+        "#756bb1", "#9e9ac8", "#bcbddc", "#dadaeb",
+        "#636363", "#969696", "#bdbdbd", "#d9d9d9"
+            ];
+
     species_scale = d3.scale.ordinal()
         .domain(species_domain)
-        .range(["red", "blue", "green"]);
+        .range([d3_category20c[0], d3_category20c[6], d3_category20c[8]]);
 
-    svg.selectAll('circle')
-        .data(data)
+    var circle = svg.selectAll('circle')
+        .data(data);
+
+    circle
         .enter()
         .append('circle')
         .attr('r', dims.radius)
         .attr('fill', function(d) { return species_scale(d['Species']); })
         .attr('cx', function(d) { return x(d[params.x_feature]); })
-        .attr('cy', function(d) { return y(d[params.y_feature]); });
+        .attr('cy', function(d) { return dims.height - y(d[params.y_feature]); });
+
+    circle.on('mouseover', function(that) {
+        d3.selectAll('circle').filter(function(d) {
+            return d.idx === that.idx;
+        }).attr('fill', 'red');
+    });
+
+    circle.on('mouseout', function(that) {
+        d3.selectAll('circle').filter(function(d) {
+            return d.idx === that.idx;
+        }).attr('fill', function(d) { return species_scale(d['Species']); })
+    });
+
+    if (params.x_axis) {
+        svg.append('g')
+            .attr('class', 'axis')
+            .attr('transform', 'translate(0,' + dims.top_padding + ')')
+                    .call(d3.svg.axis()
+                        .scale(x)
+                        .orient("top")
+                        .ticks(5));
+    }
+
+    if (params.y_axis) {
+        svg.append('g')
+            .attr('class', 'axis')
+            .attr('transform', 'translate(' + dims.width + ',0)')
+                    .call(d3.svg.axis()
+                        .scale(y)
+                        .orient("right")
+                        .ticks(5));
+    }
 
     return svg;
 };
