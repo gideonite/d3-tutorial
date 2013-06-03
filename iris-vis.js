@@ -1,17 +1,18 @@
 var process_data = function(data) {
-    return data.map(function(d){
+    return data.map(function(d, i){
         d['Petal.Length'] = parseFloat(d['Petal.Length']);
         d['Petal.Width'] = parseFloat(d['Petal.Width']);
-        d['Septal.Length'] = parseFloat(d['Septal.Length']);
-        d['Septal.Width'] = parseFloat(d['Septal.Width']);
+        d['Sepal.Length'] = parseFloat(d['Sepal.Length']);
+        d['Sepal.Width'] = parseFloat(d['Sepal.Width']);
+        d['idx'] = i;       // use this as an id later
 
         return d;
     });
 };
 
 var dims = {
-    width: 500,
-    height: 500,
+    width: 250,
+    height: 250,
     radius: 2.5
 };
 
@@ -20,9 +21,9 @@ var margin = {
     top: 50
 };
 
-// params:
-var iris_plot = function(params) {
-//div, data, x_feature, y_feature
+// params: an object with the following: div, data, x_feature, y_feature
+// returns the svg containing the scatter plot
+var iris_scatter = function(params) {
 
     data = process_data(params.data);
 
@@ -69,4 +70,6 @@ var iris_plot = function(params) {
         .attr('fill', function(d) { return species_scale(d['Species']); })
         .attr('cx', function(d) { return x(d[params.x_feature]); })
         .attr('cy', function(d) { return y(d[params.y_feature]); });
+
+    return svg;
 };

@@ -22,9 +22,6 @@
     var d;
     d3.tsv('iris.txt', function(data){
         d = data;
-
-
-            iris_plot( { div: document.getElementById('container'), data: data, x_feature: "Sepal.Length", y_feature: "Petal.Width" });
     });
 </script>
 
