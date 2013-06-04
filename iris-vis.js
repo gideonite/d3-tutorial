@@ -1,3 +1,4 @@
+// takes a list of iris data and converts strings to numbers
 var process_data = function(data) {
     return data.map(function(d, i){
         d['Petal.Length'] = parseFloat(d['Petal.Length']);
@@ -10,21 +11,36 @@ var process_data = function(data) {
     });
 };
 
-var dims = {
-    width: 200,
-    height: 200,
-    radius: 2.5,
-    height_padding: 20
-};
+var species_domain = ['setosa', 'versicolor', 'virginica'];
 
-var margin = {
-    right: 20,
-    top: 50
-};
+// lifted from the d3/lib
+var d3_category20c = [
+"#3182bd", "#6baed6", "#9ecae1", "#c6dbef",
+    "#e6550d", "#fd8d3c", "#fdae6b", "#fdd0a2",
+    "#31a354", "#74c476", "#a1d99b", "#c7e9c0",
+    "#756bb1", "#9e9ac8", "#bcbddc", "#dadaeb",
+    "#636363", "#969696", "#bdbdbd", "#d9d9d9"
+    ];
+
+    species_scale = d3.scale.ordinal()
+.domain(species_domain)
+    .range([d3_category20c[0], d3_category20c[6], d3_category20c[8]]);
 
 // params: an object with the following: div, data, x_feature, y_feature
 // returns the svg containing the scatter plot
 var iris_scatter = function(params) {
+    var dims = {
+        width: 200,
+        height: 200,
+        radius: 2.5,
+        padding_top: 20,
+        padding_right: 10
+    };
+
+    var margin = {
+        right: 20,
+        top: 50
+    };
 
     data = process_data(params.data);
 
@@ -43,7 +59,7 @@ var iris_scatter = function(params) {
 
     var x = d3.scale.linear()
         .domain(x_domain)
-        .range([dims.radius, dims.width]);
+        .range([dims.radius, dims.width - dims.padding_right - dims.radius - 5]);
 
     // y
     var y_domain = data.map(function(d) {
@@ -53,24 +69,7 @@ var iris_scatter = function(params) {
 
     var y = d3.scale.linear()
         .domain(y_domain)
-        .range([dims.radius, dims.height]);
-
-    var species_domain = data.map(function(d) {
-        return d['Species'];
-    });
-
-    // lifted from the d3/lib
-    var d3_category20c = [
-        "#3182bd", "#6baed6", "#9ecae1", "#c6dbef",
-        "#e6550d", "#fd8d3c", "#fdae6b", "#fdd0a2",
-        "#31a354", "#74c476", "#a1d99b", "#c7e9c0",
-        "#756bb1", "#9e9ac8", "#bcbddc", "#dadaeb",
-        "#636363", "#969696", "#bdbdbd", "#d9d9d9"
-            ];
-
-    species_scale = d3.scale.ordinal()
-        .domain(species_domain)
-        .range([d3_category20c[0], d3_category20c[6], d3_category20c[8]]);
+        .range([dims.height, dims.padding_top + dims.radius + 5]);
 
     var circle = svg.selectAll('circle')
         .data(data);
@@ -81,24 +80,29 @@ var iris_scatter = function(params) {
         .attr('r', dims.radius)
         .attr('fill', function(d) { return species_scale(d['Species']); })
         .attr('cx', function(d) { return x(d[params.x_feature]); })
-        .attr('cy', function(d) { return dims.height - y(d[params.y_feature]); });
+        .attr('cy', function(d) { return y(d[params.y_feature]); });
 
     circle.on('mouseover', function(that) {
         d3.selectAll('circle').filter(function(d) {
             return d.idx === that.idx;
-        }).attr('fill', 'red');
+        })
+        .attr('fill', 'red')
+        .attr('r', dims.radius * 2)
+        .style('z-index', 200);
     });
 
     circle.on('mouseout', function(that) {
         d3.selectAll('circle').filter(function(d) {
             return d.idx === that.idx;
-        }).attr('fill', function(d) { return species_scale(d['Species']); })
+        })
+        .attr('fill', function(d) { return species_scale(d['Species']); })
+        .attr('r', dims.radius);
     });
 
     if (params.x_axis) {
         svg.append('g')
             .attr('class', 'axis')
-            .attr('transform', 'translate(0,' + dims.top_padding + ')')
+            .attr('transform', 'translate(0,' + dims.padding_top + ')')
                     .call(d3.svg.axis()
                         .scale(x)
                         .orient("top")
@@ -108,7 +112,7 @@ var iris_scatter = function(params) {
     if (params.y_axis) {
         svg.append('g')
             .attr('class', 'axis')
-            .attr('transform', 'translate(' + dims.width + ',0)')
+            .attr('transform', 'translate(' + (dims.width - dims.padding_right) + ',0)')
                     .call(d3.svg.axis()
                         .scale(y)
                         .orient("right")
@@ -117,3 +121,38 @@ var iris_scatter = function(params) {
 
     return svg;
 };
+
+//var iris_parallel_coordinates = function(params) {
+//
+//    var dims = {
+//        width: 400,
+//        height: 200,
+//        radius: 2.5,
+//        padding_top: 20,
+//        padding_right: 10
+//    };
+//
+//    var svg = d3.select(params.div)
+//        .append('svg')
+//        .attr('width', dims.width)
+//        .attr('height', dims.height);
+//
+//    var sepal_length_range = data.map(function(d) { return d['Sepal.Length']; });
+//    sepal_length_range = [ d3.min(sepal_length_range), d3.max(sepal_length_range) ];
+//    var sepal_length_scale = d3.scale.linear()
+//        .domain(dims.height)
+//        .range(sepal_length_range);
+//
+//    var sepal_width_range = data.map(function(d) { return d['Sepal.Width']; });
+//    sepal_width_range = [ d3.min(sepal_width_range), d3.max(sepal_width_range) ];
+//    var sepal_width_scale = d3.scale.linear()
+//        .domain(dims.height)
+//        .range(sepal_width_range);
+//
+//    svg.selectAll('line')
+//        .data(params.data)
+//        .enter()
+//        .append('line')
+//        .attr('d', function(d) {
+//        });
+//};

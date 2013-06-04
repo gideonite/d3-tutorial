@@ -27,19 +27,50 @@
 <script type="text/javascript" src="iris-vis.js"></script>
 </head>
 <body>
-    <div id="row1"></div>
-    <div id="row2"></div>
+    <!--<div id="parallel-coordinates" style="float: left"></div>-->
+    <div id="row1" style="float: right;">
+    <span>Sepal Length</span>
+    </div>
+    <div id="row2" style="float: right; clear: both;">
+    <span>Sepal Width</span>
+    </div>
+    <div id="row3" style="float: right; clear: both;">
+    <span>Petal Length</span>
+    </div>
+    <div style="clear: both; margin-right: 65px; float: right;"><p>Petal Width</p></div>
 </body>
-
 <script type="text/javascript">
 
     var d;
     d3.tsv('iris.txt', function(data){
         d = data;
+        // row 1
         var row1 = document.getElementById('row1');
-        var sepalWidth_sepalLength = iris_scatter( { div: row1, data: data, x_feature: "Sepal.Width", y_feature: "Sepal.Length", x_axis: true });
-        var petalLength_sepalLength = iris_scatter( { div: row1, data: data, x_feature: "Petal.Length", y_feature: "Sepal.Length", x_axis: true });
-        var petalWidth_sepalLength = iris_scatter( { div: row1, data: data, x_feature: "Petal.Width", y_feature: "Sepal.Length", x_axis: true, y_axis: true });
+        var sepalWidth_sepalLength = iris_scatter(
+            { div: row1, data: data, x_feature: "Sepal.Width", y_feature: "Sepal.Length", x_axis: true });
+        var petalLength_sepalLength = iris_scatter(
+            { div: row1, data: data, x_feature: "Petal.Length", y_feature: "Sepal.Length", x_axis: true });
+        var petalWidth_sepalLength = iris_scatter(
+            { div: row1, data: data, x_feature: "Petal.Width", y_feature: "Sepal.Length", x_axis: true, y_axis: true });
+
+        // row 2
+        var row2 = document.getElementById('row2');
+        var petalLength_sepalWidth = iris_scatter(
+            { div: row2, data: data, x_feature: "Petal.Length", y_feature: "Sepal.Width"});
+        var petalWidth_sepalWidth = iris_scatter(
+            { div: row2, data: data, x_feature: "Petal.Width", y_feature: "Sepal.Width", y_axis: true});
+
+        // row 3
+        var row3 = document.getElementById('row3');
+        var petalLength_sepalWidth = iris_scatter(
+            { div: row3, data: data, x_feature: "Petal.Width", y_feature: "Petal.Length", y_axis: true});
+
+        d3.selectAll('#row2 svg').style('margin-top', null)
+        d3.selectAll('#row3 svg').style('margin-top', null)
+
+        //iris_parallel_coordinates(
+        //        {div: document.getElementById('parallel-coordinates'),
+        //        data: data})
     });
 </script>
 
