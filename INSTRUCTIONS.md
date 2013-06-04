@@ -5,3 +5,4 @@
 # server
     python -m SimpleHTTPServer 8001
 
+start a **git** repo at the beginning
