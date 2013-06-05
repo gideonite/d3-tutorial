@@ -1,4 +1,9 @@
-// takes a list of iris data and converts strings to numbers
+// params: array of iris data
+//
+// converts strings to floats, and adds a field 'idx' which is the datum's
+// index in the array.  Later this 'idx' is used to identify the datum.
+//
+// returns processed list of data
 var process_data = function(data) {
     return data.map(function(d, i){
         d['Petal.Length'] = parseFloat(d['Petal.Length']);
@@ -22,11 +27,14 @@ var d3_category20c = [
     "#636363", "#969696", "#bdbdbd", "#d9d9d9"
     ];
 
+    // probably not the clearest way of doing this
     species_scale = d3.scale.ordinal()
-.domain(species_domain)
+    .domain(species_domain)
     .range([d3_category20c[0], d3_category20c[6], d3_category20c[8]]);
 
-// params: an object with the following: div, data, x_feature, y_feature
+// params: an object with the following: [ div, data, x_feature, y_feature,
+// x_axis (boolean), y_axis (boolean) ]
+//
 // returns the svg containing the scatter plot
 var iris_scatter = function(params) {
     var dims = {
@@ -51,39 +59,41 @@ var iris_scatter = function(params) {
         .attr('width', dims.width + 2 * dims.radius)
         .attr('height', dims.height + 2 * dims.radius);
 
-    // x
+    // x scale
     var x_domain = data.map(function(d) {
         return d[params.x_feature];
     });
     x_domain = [d3.min(x_domain), d3.max(x_domain)];
 
-    var x = d3.scale.linear()
+    var x_scale = d3.scale.linear()
         .domain(x_domain)
         .range([dims.radius, dims.width - dims.padding_right - dims.radius - 5]);
 
-    // y
+    // y scale
     var y_domain = data.map(function(d) {
         return d[params.y_feature];
     });
     y_domain = [d3.min(y_domain), d3.max(y_domain)];
 
-    var y = d3.scale.linear()
+    var y_scale = d3.scale.linear()
         .domain(y_domain)
         .range([dims.height, dims.padding_top + dims.radius + 5]);
 
     var circle = svg.selectAll('circle')
-        .data(data);
+        .data(data);        // bind data to circles
 
     circle
-        .enter()
+        .enter()            // create an enter selection
         .append('circle')
         .attr('r', dims.radius)
         .attr('fill', function(d) { return species_scale(d['Species']); })
-        .attr('cx', function(d) { return x(d[params.x_feature]); })
-        .attr('cy', function(d) { return y(d[params.y_feature]); });
+        .attr('cx', function(d) { return x_scale(d[params.x_feature]); })
+        .attr('cy', function(d) { return y_scale(d[params.y_feature]); });
 
     circle.on('mouseover', function(that) {
         d3.selectAll('circle').filter(function(d) {
+            // grab all the points whose data have the same index as the one
+            // mouse overed
             return d.idx === that.idx;
         })
         .attr('fill', 'red')
@@ -104,7 +114,7 @@ var iris_scatter = function(params) {
             .attr('class', 'axis')
             .attr('transform', 'translate(0,' + dims.padding_top + ')')
                     .call(d3.svg.axis()
-                        .scale(x)
+                        .scale(x_scale)
                         .orient("top")
                         .ticks(5));
     }
@@ -114,7 +124,7 @@ var iris_scatter = function(params) {
             .attr('class', 'axis')
             .attr('transform', 'translate(' + (dims.width - dims.padding_right) + ',0)')
                     .call(d3.svg.axis()
-                        .scale(y)
+                        .scale(y_scale)
                         .orient("right")
                         .ticks(5));
     }
