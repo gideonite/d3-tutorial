@@ -131,38 +131,3 @@ var iris_scatter = function(params) {
 
     return svg;
 };
-
-//var iris_parallel_coordinates = function(params) {
-//
-//    var dims = {
-//        width: 400,
-//        height: 200,
-//        radius: 2.5,
-//        padding_top: 20,
-//        padding_right: 10
-//    };
-//
-//    var svg = d3.select(params.div)
-//        .append('svg')
-//        .attr('width', dims.width)
-//        .attr('height', dims.height);
-//
-//    var sepal_length_range = data.map(function(d) { return d['Sepal.Length']; });
-//    sepal_length_range = [ d3.min(sepal_length_range), d3.max(sepal_length_range) ];
-//    var sepal_length_scale = d3.scale.linear()
-//        .domain(dims.height)
-//        .range(sepal_length_range);
-//
-//    var sepal_width_range = data.map(function(d) { return d['Sepal.Width']; });
-//    sepal_width_range = [ d3.min(sepal_width_range), d3.max(sepal_width_range) ];
-//    var sepal_width_scale = d3.scale.linear()
-//        .domain(dims.height)
-//        .range(sepal_width_range);
-//
-//    svg.selectAll('line')
-//        .data(params.data)
-//        .enter()
-//        .append('line')
-//        .attr('d', function(d) {
-//        });
-//};
